@@ -10,15 +10,19 @@ $path = isset($url["path"]) ? $url["path"] : "/";
 //Import des classes
 use App\Controller\HomeController;
 use App\Controller\ErrorController;
+//importer avec use CategoryController
 
 //Instance des controllers
 $homeController = new HomeController();
 $errorController = new ErrorController();
-
+//instancier CategoryController
 //router
 switch ($path) {
     case '/':
         $homeController->index();
+        break;
+    case '/category/add':
+        //appeler la méthode addCategory (CategoryController)
         break;
     case '/login':
         echo "login";
