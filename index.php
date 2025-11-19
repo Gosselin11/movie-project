@@ -45,6 +45,9 @@ switch ($path) {
     default:
         $errorController->error404();
         break;
+    case '/movie/add':
+        $movieController->addMovie();
+        break;
 }
 
 //router connecté user
