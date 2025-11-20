@@ -42,7 +42,9 @@ class MovieRepository
                 //Préparer la requête
                 $reqAsso = $this->connect->prepare($sqlAsso);
                 //Assigner les paramètres
+                //BindParam si variable
                 $reqAsso->bindParam(1, $id, \PDO::PARAM_INT);
+                //BindValue si objet (getter)
                 $reqAsso->bindValue(2, $category->getId(), \PDO::PARAM_INT);
                 //Exécuter la requête
                 $reqAsso->execute();
