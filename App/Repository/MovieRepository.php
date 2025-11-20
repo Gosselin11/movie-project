@@ -52,4 +52,33 @@ class MovieRepository
             echo $e->getMessage();
         }
     }
+    public function findAllMovies(): array
+    {
+        $movies = [];
+        try {
+            //Requête SQL
+            $sql = "SELECT m.id, m.title, m.description, m.publish_at 
+                    FROM movie AS m 
+                    ORDER BY m.publish_at DESC";
+            //Préparation
+            $req = $this->connect->prepare($sql);
+            //Exécution de la requête
+            $req->execute();
+            //Fetch
+            $movieData = $req->fetchAll(\PDO::FETCH_ASSOC);
+            //Boucle pour hydrater les objets Movie
+            foreach ($movieData as $data) {
+                $movie = new Movie();
+                $movie->setId((int)$data['id']);
+                $movie->setTitle($data['title']);
+                $movie->setDescription($data['description']);
+                $movie->setPublishAt(new \DateTime($data['publish_at']));
+                //Ajouter l'objet Movie au tableau des movies
+                $movies[] = $movie;
+            }
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+        return $movies;
+    }
 }
