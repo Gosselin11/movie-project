@@ -31,10 +31,22 @@ class MovieRepository
             $req->bindValue(3, $movie->getPublishAt()->format("Y-m-d"), \PDO::PARAM_STR);
             //Exécuter la requête
             $req->execute();
-            
             //Récupérer l'id du film ajouté
             $id = $this->connect->lastInsertId();
-            
+            //Setter l'id à l'objet Movie
+            $movie->setId($id);
+            //Ajout des categories (si elle existe)
+            $this->saveCategoryToMovie($movie);
+
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
+    //Méthode qui ajoute les catégories à un Film
+    public function saveCategoryToMovie(Movie $movie): void
+    {
+        try {
             //Boucle pour associer les categories à la table association
             foreach ($movie->getCategories() as $category) {
                 //Requête table association movie_category
@@ -42,14 +54,13 @@ class MovieRepository
                 //Préparer la requête
                 $reqAsso = $this->connect->prepare($sqlAsso);
                 //Assigner les paramètres
-                //BindParam si variable
-                $reqAsso->bindParam(1, $id, \PDO::PARAM_INT);
-                //BindValue si objet (getter)
+                //BindValue id Movie
+                $reqAsso->bindValue(1, $movie->getId(), \PDO::PARAM_INT);
+                //BindValue si objet Category(getter)
                 $reqAsso->bindValue(2, $category->getId(), \PDO::PARAM_INT);
                 //Exécuter la requête
                 $reqAsso->execute();
             }
-            
         } catch (\Exception $e) {
             echo $e->getMessage();
         }

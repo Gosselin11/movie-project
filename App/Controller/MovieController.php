@@ -58,17 +58,21 @@ class MovieController
                 $movie->setTitle($title);
                 $movie->setDescription($description);
                 $movie->setPublishAt(new \DateTimeImmutable($publishAt));
-                //Setter les categories à $movie
-                foreach ($_POST["categories"] as $category) {
-                    //Créer un objet Category
-                    $newCategory = new Category("");
-                    //Setter l'ID
-                    $newCategory->setId((int) $category);
-                    //Ajouter la categorie à la liste des Category de Movie
-                    $movie->addCategory($newCategory);
+                //Test si les categories existes
+                if (isset($_POST["categories"])) {
+                    //Setter les categories à $movie
+                    foreach ($_POST["categories"] as $category) {
+                        //Créer un objet Category
+                        $newCategory = new Category("");
+                        //Setter l'ID
+                        $newCategory->setId((int) $category);
+                        //Ajouter la categorie à la liste des Category de Movie
+                        $movie->addCategory($newCategory);
+                    }
                 }
                 //Appeler la méthode saveMovie du MovieRepository
                 $this->movieRepository->saveMovie($movie);
+                //Message de validation
                 $data["valid"] = "Le film : " . $movie->getTitle() . " a été ajouté en BDD";
             }
             //Afficher un message d'erreur
@@ -76,11 +80,11 @@ class MovieController
                 $data["error"] = "Veuillez renseigner les champs du formulaire";
             }
         }
-        //Récupération des catégories
+        //Récupération des catégories(pour la vue)
         $categories = $this->categoryRepository->findAllCategories();
-        //Ajout au tableau $data
+        //Ajout des Categories au tableau $data
         $data["categories"] = $categories;
-        
+        //Afficher la vue
         return $this->render("add_movie", "Add Category", $data);
     }
 }
