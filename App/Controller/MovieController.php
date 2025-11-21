@@ -45,13 +45,70 @@ class MovieController
             if (
                 !empty($_POST["title"]) &&
                 !empty($_POST["description"]) &&
-                !empty($_POST["publish_at"])
-            ) {
+                !empty($_POST["publish_at"]) &&
+                !empty($_POST["cover"])
+            )
+             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Récupération des champs du formulaire
+        $title       = htmlspecialchars(trim($_POST['title'] ?? ''));
+        $description = htmlspecialchars(trim($_POST['description'] ?? ''));
+        $publishAt   = htmlspecialchars(trim($_POST['publish_at'] ?? ''));
+
+        // Création de l'objet Movie
+        $movie = new Movie();
+        $movie->setTitle($title);
+        $movie->setDescription($description);
+        $movie->setPublishAt($publishAt);
+
+        // --- Gestion de l'image ---
+        if (isset($_FILES['cover']) && $_FILES['cover']['error'] === UPLOAD_ERR_OK) {
+            // Extension du fichier
+            $ext = pathinfo($_FILES['cover']['name'], PATHINFO_EXTENSION);
+
+            // Générer un nom unique : titre + uuid + extension
+            $uuid = uniqid();
+            $safeTitle = preg_replace('/[^a-zA-Z0-9]/', '', strtolower($title));
+            $fileName = $safeTitle . "_" . $uuid . "." . $ext;
+
+            // Destination
+            $destination = __DIR__ . "/../../public/asset/" . $fileName;
+
+            // Vérifier si le fichier existe déjà
+            if (file_exists($destination)) {
+                $fileName = $safeTitle . "_" . uniqid() . "." . $ext;
+                $destination = __DIR__ . "/../../public/asset/" . $fileName;
+            }
+
+            // Déplacer le fichier
+            if (move_uploaded_file($_FILES['cover']['tmp_name'], $destination)) {
+                $movie->setCover($fileName);
+            } else {
+                $movie->setCover("default.png");
+            }
+        } else {
+            // Aucun fichier uploadé
+            $movie->setCover("default.png");
+        }
+
+        // Sauvegarde en BDD
+        $this->movieRepository->saveMovie($movie);
+
+        // Rendu avec message de succès
+        $this->render("add_movie", "Ajouter un film", [
+            "success" => "Film ajouté avec succès !"
+        ]);
+    } else {
+        // Afficher le formulaire
+        $this->render("add_movie", "Ajouter un film");
+    }
+            {
 
                 //Nettoyer les entrées utilsiateur ($_POST du formulaire)
                 $title = Tools::sanitize($_POST["title"]);
                 $description = Tools::sanitize($_POST["description"]);
                 $publishAt = Tools::sanitize($_POST["publish_at"]);
+                $cover = Tools::sanitize($_POST["cover"]);
+
                 //Créer un objet Movie
                 $movie = new Movie();
                 //Setter les valeurs
