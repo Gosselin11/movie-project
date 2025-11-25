@@ -133,7 +133,7 @@ class AccountRepository
      * @param int $idAccount if du compte
      * @return bool true si existe | false si n'existe pas
      */
-    public function isMovieToAccountExists(Movie $movie, int $idAccount) : bool
+    public function isMovieToAccountExists(Movie $movie, int $idAccount): bool
     {
         try {
             //Ecrire la requête
@@ -156,5 +156,18 @@ class AccountRepository
             return false;
         }
         return true;
+    }
+    public function findAllMoviesToAccount(int $accountId): array
+    {
+        try {
+            $sql = "SELECT m.id, m.title, m.description, m.publish_at, .cover FROM account_movie AS am INNER JOIN movie AS m ON am.id_movie = m.id WHERE am.id_account = ?";
+            $req = $this->connect->prepare($sql);
+            $req->bindValue(1, $accountId, \PDO::PARAM_INT);
+            $req->execute();
+            return $req->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+            return [];
+        }
     }
 }

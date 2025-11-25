@@ -77,6 +77,10 @@ if (isset($_SESSION["connected"]) && $_SESSION["connected"] == true) {
             case '/account/movie':
                 $registerController->addMovieToAccount();
                 break;
+            case '/account/movies':
+                $registerController->showAllMoviesToAccount();
+                break;
+
             case '/email':
                 $homeController->testEmail();
                 break;

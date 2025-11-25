@@ -79,8 +79,7 @@ class RegisterController extends AbstractController
                 } else {
                     $data["error"] = "Veuillez renseigner tous les champs du formulaire";
                 }
-            }
-            catch(\PDOException $pdo) {
+            } catch (\PDOException $pdo) {
                 $data["error"] = $pdo->getMessage();
             }
             //Capture de la ValidationException
@@ -168,11 +167,11 @@ class RegisterController extends AbstractController
                 //Récupération de l'ID account
                 $idAccount = $_SESSION["id"];
                 //Test si le film (Movie) n'est pas associé au compte (Account)
-                if (!$this->accountRepository->isMovieToAccountExists($movie, $idAccount )) {
+                if (!$this->accountRepository->isMovieToAccountExists($movie, $idAccount)) {
                     //Appel de la méthode (associer un film)
                     $this->accountRepository->saveMovieToAccount($movie, $idAccount);
                     $data["valid"] = "Le film a été associé";
-                } 
+                }
                 //Sinon on affiche une erreur
                 else {
                     $data["error"] = "Le film est déja associé en BDD";
@@ -182,11 +181,32 @@ class RegisterController extends AbstractController
             else {
                 $data["error"] = "Veuillez sélectionner un film";
             }
-        
         }
         //Tableau de films
         $data["movies"] = $this->movieRepository->findAllMovies();
         //rendu du template
         return $this->render("add_movie_to_account", "Associer film", $data);
+    }
+    public function showAllMoviesToAccount(): void
+    {
+
+        if (!isset($_SESSION["id"])) {
+
+            echo "Vous devez être connecté.";
+            return;
+        }
+
+
+        $accountId = $_SESSION["id"];
+
+
+        $movies = $this->accountRepository->findAllMoviesToAccount($accountId);
+
+
+        $data = [];
+        $data["movies"] = $movies;
+
+
+        $this->render("template_show_all_movie_to_account", "Mes films", $data);
     }
 }
